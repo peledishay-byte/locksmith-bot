@@ -1,0 +1,22 @@
+{
+  "name": "locksmith-bot",
+  "version": "1.0.0",
+  "description": "Facebook Messenger AI bot for an Ohio locksmith business, with Telegram-group escalation when the bot is unsure.",
+  "main": "src/index.js",
+  "type": "module",
+  "engines": {
+    "node": ">=20"
+  },
+  "scripts": {
+    "start": "node src/index.js",
+    "dev": "node --watch src/index.js",
+    "register-telegram-webhook": "node scripts/register-telegram-webhook.js",
+    "sync-keys": "node scripts/sync-aks-to-sheets.js"
+  },
+  "dependencies": {
+    "@anthropic-ai/sdk": "^0.32.1",
+    "better-sqlite3": "^11.5.0",
+    "dotenv": "^16.4.5",
+    "express": "^4.21.1"
+  }
+}
