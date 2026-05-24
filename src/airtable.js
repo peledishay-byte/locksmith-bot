@@ -130,4 +130,7 @@ export async function findKeyForVehicle({ make, model, year }) {
       keyImageUrl: img,
       aksPrice: Number(f['AKS Price (USD)']) || 0,
       markupPct: Number(f['Markup %']) || 0,
-      customerPrice: Number(f['Customer Price']) || 
+      customerPrice: Number(f['Customer Price']) ||  0,
+    };
+  });
+}
