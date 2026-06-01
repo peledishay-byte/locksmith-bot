@@ -141,18 +141,25 @@ Flow:
 
    The tool returns EVERY key type we stock for that exact vehicle and
    year. The list is authoritative - it is our actual catalog. Use it
-   carefully:
-   - Always mention the key type the catalog shows ("transponder key",
-     "smart/proximity key", "flip key") so the lead can confirm it
-     matches what they had.
+   carefully.
+
+   CRITICAL RULE: When you reply to the lead AFTER a lookup, your reply
+   MUST explicitly name the key type(s) from the results. Never reply
+   "I don't have that in our catalog" without first saying what we DO
+   have for that car/year. The lead cannot help you if they don't know
+   what we stock.
+
    - If the lead asks about a key type that is NOT in the results, do
-     NOT generically agree to it. Instead, tell them what we DO have for
-     their year and check if maybe they meant a different year. Example:
-     lead has a 2015 Enclave (catalog returns only Transponder Key B111)
-     and asks about a smart key - reply: "For the 2015 Enclave, we use a
-     transponder key. The smart/proximity version of the Enclave started
-     in 2018, so if your original was a smart key, can you double-check
-     the year for me?"
+     NOT just say "we don't have it". Tell them what we DO have for
+     their year, by key type and SKU, and suggest checking if maybe they
+     meant a different year. Concrete example:
+       Lead: "Can you do a smart key for my 2015 Buick Enclave?"
+       Tool returns: B111 Transponder Key for 2007-2017.
+       GOOD reply: "For a 2015 Enclave we stock a transponder key (B111),
+       not a smart/proximity key — those started on the Enclave in 2018.
+       If your original was a smart key, can you double-check the year?"
+       BAD reply: "I don't have that exact spec in our catalog."
+       BAD reply: "Yes we handle smart keys, our tech will quote."
    - If results include a price: quote the RANGE matching their
      situation (spare if they have a working key, replacement otherwise).
      Never quote a single exact number. E.g. "For a spare on your 2015
@@ -220,7 +227,17 @@ async def _execute_tool(tool_name: str, tool_input: dict, psid: str) -> str:
             matches = await sheets_client.lookup_car_key(mfg, model, year)
         except Exception as e:
             log.exception("lookup_car_key failed")
+            _log_event("tool_call", psid=psid, tool="lookup_car_key",
+                       input=tool_input, error=str(e))
             return f"Lookup failed: {e}. Tell the lead you'll have a tech check pricing."
+        _log_event("tool_call", psid=psid, tool="lookup_car_key",
+                   input=tool_input,
+                   n_matches=len(matches),
+                   matches_summary=[
+                       f"{m.get('manufacturer')} {m.get('model')} {m.get('year_raw')} "
+                       f"[{m.get('key_type')}] {m.get('key_name')}"
+                       for m in matches[:5]
+                   ])
         if not matches:
             return (
                 f"No catalog match for '{mfg} {model} {year or ''}'. "
