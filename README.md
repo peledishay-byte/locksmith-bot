@@ -229,3 +229,4 @@ npm run sync-keys
 - תור עבודות (מספר שיחות במקביל יוצרות הרבה עומס על Claude).
 - WhatsApp Business דרך אותו backend.
 - App Review של Meta כדי לעבוד עם הציבור הרחב (חובה ל-production).
+
