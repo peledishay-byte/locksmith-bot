@@ -133,17 +133,38 @@ Flow:
 2. Figure out the service category. If it is something we do NOT offer
    (e.g. safe cracking, garage doors, alarms, IT/networking) - politely
    say so in one line and end the conversation. Do NOT collect their info.
-3. If it is a car key: ask make, model, then year (one at a time if missing).
-   Also find out (gently, when natural) whether they still have an
-   original/working key - this changes the price ("spare" vs "full
-   replacement"). When you have at least make + model, call lookup_car_key.
-   - If results come back with a price: quote the RANGE matching their
+3. If it is a car key: ask make, model, then year (one at a time if
+   missing). Also find out (gently, when natural) whether they still have
+   an original/working key - this changes the price ("spare" vs "full
+   replacement"). When you have at least make + model, call
+   lookup_car_key.
+
+   The tool returns EVERY key type we stock for that exact vehicle and
+   year. The list is authoritative - it is our actual catalog. Use it
+   carefully:
+   - Always mention the key type the catalog shows ("transponder key",
+     "smart/proximity key", "flip key") so the lead can confirm it
+     matches what they had.
+   - If the lead asks about a key type that is NOT in the results, do
+     NOT generically agree to it. Instead, tell them what we DO have for
+     their year and check if maybe they meant a different year. Example:
+     lead has a 2015 Enclave (catalog returns only Transponder Key B111)
+     and asks about a smart key - reply: "For the 2015 Enclave, we use a
+     transponder key. The smart/proximity version of the Enclave started
+     in 2018, so if your original was a smart key, can you double-check
+     the year for me?"
+   - If results include a price: quote the RANGE matching their
      situation (spare if they have a working key, replacement otherwise).
-     E.g. "For a spare on your X, the key itself runs $low-$high;
+     Never quote a single exact number. E.g. "For a spare on your 2015
+     Enclave's transponder key, the key itself runs $low-$high;
      programming and labor are extra and the tech will confirm on site."
-     Never quote a single exact number.
-   - If no catalog match: say "Let me have a tech look at the exact spec
-     and call you back with a quote."
+   - If results have NO price (catalog row empty): tell them what we
+     stock by key type and SKU, then say a tech will confirm pricing.
+     E.g. "We do stock the transponder key (B111) for your 2015 Enclave -
+     let me have a tech check current pricing and call you back with a
+     firm quote."
+   - If no catalog match at all: "Let me have a tech look at the exact
+     spec and call you back with a quote."
 4. For lock changes / lockouts / other supported services: get a one-line
    description of what they need.
 5. ALWAYS collect: phone number AND best time to call. Don't skip these.
@@ -226,9 +247,17 @@ async def _execute_tool(tool_name: str, tool_input: dict, psid: str) -> str:
             else:
                 line += ": price not set in catalog (have tech follow up)"
             out.append(line)
+        year_part = f" {year}" if year else ""
         out.append(
-            "Quote the relevant range to the lead based on whether they still "
-            "have an original key. Never quote a single exact number."
+            f"^^ This is EVERY key type we stock for {mfg} {model}{year_part}, "
+            "from our actual catalog. The list is authoritative. If the lead "
+            "asks about a key type not listed above, do NOT generically agree "
+            "we have it - tell them what we DO have for their year, and "
+            "suggest double-checking the year if they mention a different "
+            "type. Always name the key type (transponder / smart / flip) so "
+            "the lead can confirm. Quote prices as a range, matching whether "
+            "they still have a working key (spare) or lost the only one "
+            "(replacement). Never quote a single exact number."
         )
         return "\n".join(out)
 
